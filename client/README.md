@@ -1,4 +1,4 @@
-# client2
+# vue-racuni
 
 ## Project setup
 ```

@@ -1,10 +1,10 @@
 module.exports = {
-  "configureWebpack": {
-    "externals": {
-      "Dynamsoft": "Dynamsoft"
-    }
+  configureWebpack: {
+    externals: {
+      Dynamsoft: 'Dynamsoft',
+    },
   },
-  "transpileDependencies": [
-    "vuetify"
-  ]
-}
+  transpileDependencies: [
+    'vuetify',
+  ],
+};

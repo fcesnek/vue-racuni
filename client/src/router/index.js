@@ -1,39 +1,39 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import EnterBill from '../views/EnterBill.vue'
-import LoginForm from '../views/LoginForm.vue'
-import RegisterForm from '../views/RegisterForm.vue'
-import Home from '../views/Home.vue'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import EnterBill from '../views/EnterBill.vue';
+import LoginForm from '../views/LoginForm.vue';
+import RegisterForm from '../views/RegisterForm.vue';
+import Home from '../views/Home.vue';
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: Home,
   },
   {
     path: '/unos-racuna',
     name: 'enter-bill',
-    component: EnterBill
+    component: EnterBill,
   },
   {
     path: '/prijava',
     name: 'login-form',
-    component: LoginForm
+    component: LoginForm,
   },
   {
     path: '/registracija',
     name: 'register-form',
-    component: RegisterForm
-  }
-]
+    component: RegisterForm,
+  },
+];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;

@@ -1,19 +1,20 @@
 <template>
-  <v-container>
-    <v-flex>
-      <h1>
-        Za korištenje aplikacije potrebno je registrirati se ili se prijaviti
-      </h1>
-    </v-flex>
+<v-app>
+  <v-container grid-list-md text-xs-center>
+    <v-layout justify-center align-center>
+      <v-flex xs6 offset-xs-3>
+        <h1>Za korištenje aplikacije potrebna je:</h1>
+        <h2>Registracija</h2> ili <h2>Prijava</h2>
+      </v-flex>
+    </v-layout>
   </v-container>
+</v-app>
+
 </template>
 
 <script>
-export default {
-
-}
+export default {};
 </script>
 
 <style>
-
 </style>
