@@ -16,6 +16,12 @@ const BillSchema = new mongoose.Schema({
   cost: {
     type: Number
   },
+  month: {
+    type: Number
+  },
+  year: {
+    type: Number
+  },
   isPaidFor: {
     type: Boolean,
     default: false
