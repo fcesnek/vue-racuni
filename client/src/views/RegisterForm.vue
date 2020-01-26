@@ -1,21 +1,15 @@
 <template>
   <v-app>
-    <v-container grid-list-md text-xs-center>
+    <v-container fill-height fluid class="mt-8">
       <v-layout justify-center>
-        <v-flex xs6 offset-xs-3>
-          <v-form v-model="valid">
+        <v-flex xs12 sm8 md4>
+          <v-form v-model="valid" class="form">
             <h1>Registracija</h1>
             <v-text-field
               v-model="username"
               :rules="nameRules"
               :counter="30"
               label="Korisničko ime"
-              required
-            ></v-text-field>
-            <v-text-field
-              v-model="email"
-              :rules="emailRules"
-              label="E-mail"
               required
             ></v-text-field>
             <v-text-field
@@ -28,7 +22,7 @@
               :counter="32"
               label="Lozinka"
               required
-            ></v-text-field>
+            />
             <v-text-field
               v-model="passwordConfirm"
               :append-icon="showPasswordConfirm ? 'mdi-eye' : 'mdi-eye-off'"
@@ -40,8 +34,15 @@
               label="Potvrda lozinke"
               required
             ></v-text-field>
+            <v-btn
+              class="mt-5 mb-5"
+              :disabled="!valid"
+              @click="signUp"
+            >Registracija</v-btn>
           </v-form>
-          <v-btn :disabled="!valid" @click="signUp">Registracija</v-btn>
+          <v-alert class="mt-5" dense outlined type="error" :value="!!error">
+            <div v-html="error" />
+          </v-alert>
         </v-flex>
       </v-layout>
     </v-container>
@@ -54,20 +55,16 @@ import UserService from '@/services/UserService';
 export default {
   data() {
     return {
+      error: '',
       valid: true,
       showPassword: false,
       showPasswordConfirm: false,
       username: '',
-      email: '',
       password: '',
       passwordConfirm: '',
       nameRules: [
         v => !!v || 'Unesite korisničko ime',
         v => (v && v.length >= 3 && v.length <= 30) || 'Ime mora biti između 3 i 30 znakova.',
-      ],
-      emailRules: [
-        v => !!v || 'Unesite email',
-        v => /.+@.+\..+/.test(v) || 'Unesite validan email',
       ],
       passwordRules: [
         v => !!v || 'Unesite lozinku',
@@ -97,5 +94,4 @@ export default {
 </script>
 
 <style>
-
 </style>

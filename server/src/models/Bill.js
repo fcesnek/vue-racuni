@@ -22,6 +22,9 @@ const BillSchema = new mongoose.Schema({
   year: {
     type: Number
   },
+  type: {
+    type: String
+  },
   isPaidFor: {
     type: Boolean,
     default: false

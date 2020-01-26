@@ -6,7 +6,7 @@
           <v-col v-for="action in actions" :key="action.name" cols="12" sm="4">
             <v-card
               @click="action.method"
-              :height="isAnyInputActive ? '100px' : '300px'"
+              :height="isAnyInputActive ? '100px' : '200px'"
               class="pa-2 align-content-center"
               hover
               tile
@@ -33,14 +33,41 @@
         <v-btn color="primary" text @click="submitFiles">Skeniraj datoteke</v-btn>
       </v-flex>
 
-      <BillForm v-if="isFormActive" />
+      <BillForm v-if="isFormActive" class="form"/>
 
-      <div v-if="bills.length > 0">
-        <v-card color="#385F73" max-width="400" dark v-for="bill in bills" :key="bill.description">
-          <v-card-title class="headline">{{bill.payer.name}}</v-card-title>
-          <v-card-subtitle>{{bill.cost}} kn</v-card-subtitle>
-          <v-card-subtitle>{{bill.description}}</v-card-subtitle>
-          <v-card-subtitle>{{bill.type}}</v-card-subtitle>
+      <div>
+        <h1>Uneseni računi</h1>
+        <v-card class="d-inline-block mx-auto">
+          <v-container>
+            <v-row justify="space-between">
+              <v-col cols="auto">
+                <v-text-field>test</v-text-field>
+                <v-text-field>test</v-text-field>
+                <v-text-field>test</v-text-field>
+                <v-card-text>300kn</v-card-text>
+                <v-card-text>Opis računa</v-card-text>
+                <v-card-text>
+                  <v-checkbox label='Račun je plaćen'></v-checkbox>
+                </v-card-text>
+              </v-col>
+
+              <v-col
+                cols="auto"
+                class="text-center pl-0"
+              >
+                <v-row
+                  class="flex-column ma-0 fill-height"
+                  justify="center"
+                >
+                  <v-col class="px-0">
+                    <v-btn icon>
+                      <v-icon color="red">mdi-close-circle-outline</v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-container>
         </v-card>
       </div>
     </v-container>
@@ -59,7 +86,7 @@ export default {
   data() {
     return {
       actions: [{
-        name: 'Unesi račun formom',
+        name: 'Unesi račun',
         method: this.showForm,
       },
       {
@@ -111,7 +138,6 @@ export default {
       Dynamsoft.BarcodeScanner.createInstance({
         UIElement: document.getElementById('div-video-container'),
         onUnduplicatedRead: (txt) => {
-          console.log(txt.split('\n'));
           this.parseResult(txt);
         },
       }).then((s) => {
@@ -126,17 +152,20 @@ export default {
       const resultArr = result.split('\n');
       const costArr = resultArr[2].split('');
       costArr.splice(-2, 0, '.');
+      console.log(resultArr);
+      const city = resultArr[5].split(' ')[1];
       const bill = {
         cost: Number(costArr.join('')),
         payer: {
           name: resultArr[3],
           street: resultArr[4],
-          city: resultArr[5],
+          city,
         },
         description: resultArr[13],
         type: this.getBillType(resultArr[11]),
         isPaidFor: false,
       };
+      console.log(bill);
       this.bills.push(bill);
     },
     hideScanner() {

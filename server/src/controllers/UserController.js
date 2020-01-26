@@ -12,33 +12,24 @@ function jwtSignUser (user) {
 module.exports = {
   async signup (req, res) {
     try {
-      const { username, email, password } = req.body;
+      const { username, password } = req.body;
 
-      const userExistsEmail = await User.findOne({
-        email
-      });
-      if(userExistsEmail)
-        res.status(400).send({ error: 'Korisnik s unesenim emailom već postoji.' });
-
-      const userExistsUsername = await User.findOne({
+      const userExists = await User.findOne({
         username
       });
-      if(userExistsUsername)
+      if(userExists)
         res.status(400).send({ error: 'Korisnik s unesenim korisničkim imenom već postoji.' });
 
       const newUser = new User({
         username,
-        email,
         password
       });
-      const { savedUsername, savedEmail } = (await newUser.save()).toJSON();
+      const { savedUsername } = (await newUser.save()).toJSON();
       res.send({
-        user: { savedUsername, savedEmail },
-        token: jwtSignUser({ savedUsername, savedEmail })
+        user: { savedUsername },
+        token: jwtSignUser({ savedUsername })
       });
     } catch (err) {
-      console.log(err);
-      
       res.status(500).send({error: 'Greška pri spremanju podataka. Pokušajte kasnije.'});
     }
   }

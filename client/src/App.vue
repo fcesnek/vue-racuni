@@ -2,7 +2,7 @@
   <div id="app">
     <nav-bar />
     <v-content>
-      <router-view />
+        <router-view />
     </v-content>
   </div>
 </template>
@@ -25,5 +25,10 @@ html, body {
 
 #app {
   font-family: 'Ubuntu', sans-serif;
+}
+.form {
+  background: white;
+  padding: 20px;
+  border: 1px solid rgb(175, 175, 175);
 }
 </style>
