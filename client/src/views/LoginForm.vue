@@ -41,7 +41,6 @@ export default {
       error: '',
       showPassword: false,
       username: '',
-      email: '',
       password: '',
     };
   },
@@ -52,7 +51,11 @@ export default {
           username: this.username,
           password: this.password,
         });
-        console.log(response);
+        this.$store.dispatch('setToken', response.data.token);
+        this.$store.dispatch('setUser', response.data.user);
+        this.$router.push({
+          name: '/',
+        });
       } catch (error) {
         this.error = error.response.data.error;
       }

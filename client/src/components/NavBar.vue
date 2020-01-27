@@ -16,13 +16,13 @@
     </v-toolbar-items>
     <v-spacer />
     <v-toolbar-items>
-      <v-btn flat to="/prijava">
+      <v-btn text to="/prijava">
         Prijava
       </v-btn>
-      <v-btn flat to="/registracija">
+      <v-btn text to="/registracija">
         Registracija
       </v-btn>
-      <v-btn flat to="/odjava">
+      <v-btn @click="logout" text to="/odjava">
         Odjava
       </v-btn>
     </v-toolbar-items>
@@ -30,6 +30,17 @@
 </template>
 
 <script>
+export default {
+  methods: {
+    logout() {
+      this.$store.dispatch('setToken', null);
+      this.$store.dispatch('setUser', null);
+      this.$router.push({
+        name: 'root',
+      });
+    },
+  },
+};
 </script>
 
 <style scoped>

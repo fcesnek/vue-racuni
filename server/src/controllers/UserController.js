@@ -24,13 +24,46 @@ module.exports = {
         username,
         password
       });
-      const { savedUsername } = (await newUser.save()).toJSON();
+      
+      const savedUser = await newUser.save();
+      const { username: savedUsername } = savedUser.toJSON();
       res.send({
-        user: { savedUsername },
-        token: jwtSignUser({ savedUsername })
+        user: {username: savedUsername},
+        token: jwtSignUser({ username: savedUsername })
       });
     } catch (err) {
       res.status(500).send({error: 'Greška pri spremanju podataka. Pokušajte kasnije.'});
     }
-  }
+  },
+  async login (req, res) {
+    try {
+      const { username, password } = req.body;
+      console.log(req.body);
+      const user = await User.findOne({
+        username
+      });
+      console.log(user);
+      
+      if (!user) {
+        return res.status(403).send({
+          error: 'Pogrešni podaci za prijavu.'
+        });
+      }
+      const isPasswordValid = await user.comparePassword(password);
+      if (!isPasswordValid) {
+        return res.status(403).send({
+          error: 'Pogrešni podaci za prijavu.'
+        });
+      }
+      const { username: savedUsername } = user.toJSON();
+      res.send({
+        user: {username: savedUsername},
+        token: jwtSignUser({ username: savedUsername })
+      });
+    } catch (err) {
+      res.status(500).send({
+        error: 'Dogodila se greška prilikom autentikacije korisnika.'
+      });
+    }
+  },
 };
