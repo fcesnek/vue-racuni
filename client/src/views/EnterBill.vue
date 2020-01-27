@@ -7,69 +7,89 @@
             <v-card
               @click="action.method"
               :height="isAnyInputActive ? '100px' : '200px'"
-              class="pa-2 align-content-center"
+              class="pa-2"
               hover
               tile
+              align-center
             >
-              <v-card-title primary-title class="justify-center">
+              <v-card-title primary-title class="action-title justify-center">
                 {{ action.name }}
               </v-card-title>
+              <div v-if="!isAnyInputActive" class="input-icon">
+                <v-icon>{{action.icon}}</v-icon>
+              </div>
             </v-card>
           </v-col>
         </v-row>
       </v-flex>
 
       <v-flex v-show="isScanActive">
-        <div v-show="!!barcodeScanner" id="div-video-container">
-          <v-btn @click="hideScanner">Sakrij</v-btn>
-          <video class="dbrScanner-video" playsinline="true"></video>
-        </div>
+        <v-container grid-list-md text-xs-center class="mt-5 form">
+          <v-layout row wrap v-show="!!barcodeScanner" id="div-video-container">
+            <v-btn class="mb-4" @click="hideScanner">Sakrij</v-btn>
+              <month-picker
+                v-if="!!barcodeScanner"
+                @periodChosen="setPeriod"
+              />
+            <video class="dbrScanner-video" playsinline="true"></video>
+          </v-layout>
+        </v-container>
       </v-flex>
 
-      <v-flex v-show="isUploadActive">
-        <v-file-input multiple small-chips id="iptDecodeImg"
-          accept="image/bmp,image/jpeg,image/png,image/gif" v-model="files"
-          label="Unos datoteka..." />
-        <v-btn color="primary" text @click="submitFiles">Skeniraj datoteke</v-btn>
+      <v-flex v-if="isUploadActive">
+        <v-container grid-list-md text-xs-center class="mt-5 form">
+          <v-layout column wrap>
+            <month-picker
+              @periodChosen="setPeriod"
+            />
+            <v-file-input
+              multiple small-chips
+              id="iptDecodeImg"
+              accept="image/bmp,image/jpeg,image/png,image/gif"
+              v-model="files"
+              label="Unos datoteka..."
+            />
+            <v-btn
+              @click="submitFiles"
+              max-width="200px"
+            >
+              Skeniraj datoteke
+            </v-btn>
+          </v-layout>
+        </v-container>
       </v-flex>
 
-      <BillForm v-if="isFormActive" class="form"/>
+      <BillForm
+        v-if="isFormActive"
+        class="form"
+        @billInput="addBill"/>
 
-      <div>
-        <h1>Uneseni računi</h1>
-        <v-card class="d-inline-block mx-auto">
-          <v-container>
-            <v-row justify="space-between">
-              <v-col cols="auto">
-                <v-text-field>test</v-text-field>
-                <v-text-field>test</v-text-field>
-                <v-text-field>test</v-text-field>
-                <v-card-text>300kn</v-card-text>
-                <v-card-text>Opis računa</v-card-text>
-                <v-card-text>
-                  <v-checkbox label='Račun je plaćen'></v-checkbox>
-                </v-card-text>
-              </v-col>
-
-              <v-col
-                cols="auto"
-                class="text-center pl-0"
-              >
-                <v-row
-                  class="flex-column ma-0 fill-height"
-                  justify="center"
-                >
-                  <v-col class="px-0">
-                    <v-btn icon>
-                      <v-icon color="red">mdi-close-circle-outline</v-icon>
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card>
-      </div>
+      <v-container
+        grid-list-md
+        text-xs-center
+        class="mt-5"
+        v-if="bills.length"
+      >
+        <v-layout row wrap class="form">
+          <v-flex xs9>
+            <h1>Uneseni računi</h1>
+          </v-flex>
+          <v-flex xs3>
+            <v-btn @click="saveBills"><v-icon>mdi-content-save</v-icon>Pohrani račune</v-btn>
+          </v-flex>
+          <v-flex
+            xs4
+            v-for="bill in bills"
+            :key="bill.billNumber"
+          >
+            <BillCard
+              @editing="isEditing"
+              @removeBill="removeBill"
+              :bill="bill"
+            />
+          </v-flex>
+        </v-layout>
+      </v-container>
     </v-container>
   </v-app>
 </template>
@@ -77,27 +97,33 @@
 <script>
 // eslint-disable-next-line
 import Dynamsoft from 'Dynamsoft';
-import BillForm from './BillForm.vue';
+import BillForm from '../components/BillForm.vue';
+import MonthPicker from '../components/MonthPicker.vue';
+import BillCard from '../components/BillCard/BillCard.vue';
 
 export default {
   components: {
     BillForm,
+    MonthPicker,
+    BillCard,
   },
   data() {
     return {
       actions: [{
         name: 'Unesi račun',
         method: this.showForm,
+        icon: 'mdi-pencil-plus',
       },
       {
         name: 'Skeniraj račun',
         method: this.showScanner,
+        icon: 'mdi-barcode-scan',
       },
       {
         name: 'Prenesi slike',
         method: this.showUpload,
-      },
-      ],
+        icon: 'mdi-image-multiple',
+      }],
       bills: [],
       barcodeScanner: null,
       files: [],
@@ -105,9 +131,25 @@ export default {
       isFormActive: false,
       isScanActive: false,
       isUploadActive: false,
+      year: '',
+      month: '',
+      editing: false,
     };
   },
   methods: {
+    isEditing({ editing }) {
+      this.editing = editing;
+    },
+    setPeriod(data) {
+      const periodArr = data.period.split('-');
+      [this.year, this.month] = [...periodArr];
+    },
+    removeBill({ bill }) {
+      this.bills.splice(this.bills.findIndex(item => item.billNumber === bill.billNumber), 1);
+    },
+    addBill({ bill }) {
+      this.bills.push(bill);
+    },
     showForm() {
       this.isFormActive = !this.isFormActive;
       if (this.isScanActive === true) {
@@ -148,11 +190,15 @@ export default {
         });
       });
     },
+    hideScanner() {
+      this.barcodeScanner.hide();
+      this.barcodeScanner = null;
+      this.isScanActive = false;
+    },
     parseResult(result) {
       const resultArr = result.split('\n');
       const costArr = resultArr[2].split('');
       costArr.splice(-2, 0, '.');
-      console.log(resultArr);
       const city = resultArr[5].split(' ')[1];
       const bill = {
         cost: Number(costArr.join('')),
@@ -161,17 +207,14 @@ export default {
           street: resultArr[4],
           city,
         },
+        month: Number(this.month),
+        year: Number(this.year),
+        billNumber: resultArr[11],
         description: resultArr[13],
-        type: this.getBillType(resultArr[11]),
         isPaidFor: false,
+        type: this.getBillType(resultArr[11]),
       };
-      console.log(bill);
       this.bills.push(bill);
-    },
-    hideScanner() {
-      this.barcodeScanner.hide();
-      this.barcodeScanner = null;
-      this.isScanActive = false;
     },
     getBillType(pattern) {
       const patterns = {
@@ -201,7 +244,7 @@ export default {
       const reader = await Dynamsoft.BarcodeReader.createInstance();
       for (const file of this.files) {
         // eslint-disable-next-line
-          const results = await reader.decode(file);
+        const results = await reader.decode(file);
         if (results.length > 0) {
           const txts = [];
           for (let i = 0; i < results.length; i += 1) {
@@ -212,6 +255,15 @@ export default {
         } else {
           this.errors.push('Barkod nije pronađen.');
         }
+      }
+      this.files = [];
+    },
+    saveBills() {
+      // TO DO
+      if (this.editing) {
+        alert('FINISH EDITING FIRST!');
+      } else {
+        console.log('saving to db');
       }
     },
   },
@@ -233,7 +285,24 @@ export default {
   }
 
   .dbrScanner-video {
-    width: 640px;
-    height: 480px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .input-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .input-icon i {
+    font-size: 4rem!important;
+  }
+  .action-title {
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    font-weight: bold;
+    word-break: keep-all;
   }
 </style>

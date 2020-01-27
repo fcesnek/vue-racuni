@@ -16,11 +16,15 @@
     </v-toolbar-items>
     <v-spacer />
     <v-toolbar-items>
-      <v-tabs fixed-tabs>
-        <v-tab to="/prijava">Prijava</v-tab>
-        <v-tab to="/registracija">Registracija</v-tab>
-        <v-tab to="/odjava">Odjava</v-tab>
-      </v-tabs>
+      <v-btn flat to="/prijava">
+        Prijava
+      </v-btn>
+      <v-btn flat to="/registracija">
+        Registracija
+      </v-btn>
+      <v-btn flat to="/odjava">
+        Odjava
+      </v-btn>
     </v-toolbar-items>
   </v-app-bar>
 </template>

@@ -40,7 +40,7 @@ export default {
       period: new Date().toISOString().substr(0, 7),
     };
   },
-  mounted() {
+  created() {
     this.emitPeriod();
   },
   methods: {
