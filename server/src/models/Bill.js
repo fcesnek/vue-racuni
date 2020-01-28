@@ -1,34 +1,52 @@
 const mongoose = require('mongoose');
 
-const BillSchema = new mongoose.Schema({
-  payerFullName: {
-    type: String
-  },
-  street: {
-    type: String
-  },
-  city: {
-    type: String
+const billSchema = new mongoose.Schema({
+  payer: {
+    name: {
+      type: String,
+      required: true,
+    },
+    street: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
   },
   description: {
     type: String
   },
   cost: {
-    type: Number
+    type: Number,
+    required: true,
   },
   month: {
-    type: Number
+    type: Number,
+    required: true,
   },
   year: {
-    type: Number
+    type: Number,
+    required: true,
+  },
+  period: {
+    type: String,
+    required: true,
   },
   type: {
-    type: String
+    type: String,
+    required: true,
+  },
+  billNumber: {
+    type: String,
+    required: true,
+    unique: true,
   },
   isPaidFor: {
     type: Boolean,
-    default: false
+    default: false,
+    required: true,
   }
 });
-
-module.exports.BillSchema = BillSchema;
+module.exports = mongoose.model('Bill', billSchema);

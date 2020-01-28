@@ -35,4 +35,9 @@ export default new Vuex.Store({
       commit('setUser', user);
     },
   },
+  getters: {
+    isUserLoggedIn: state => state.isUserLoggedIn,
+    user: state => state.user,
+    token: state => state.token,
+  },
 });

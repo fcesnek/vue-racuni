@@ -8,7 +8,7 @@
       </router-link>
     </v-toolbar-title>
     <v-spacer />
-    <v-toolbar-items>
+    <v-toolbar-items v-if="$store.state.isUserLoggedIn">
       <v-tabs>
         <v-tab to="/unos-racuna">Unos računa</v-tab>
         <v-tab to="/moji-racuni">Moji računi</v-tab>
@@ -16,13 +16,13 @@
     </v-toolbar-items>
     <v-spacer />
     <v-toolbar-items>
-      <v-btn text to="/prijava">
+      <v-btn v-if="!$store.state.isUserLoggedIn" text to="/prijava">
         Prijava
       </v-btn>
-      <v-btn text to="/registracija">
+      <v-btn v-if="!$store.state.isUserLoggedIn" text to="/registracija">
         Registracija
       </v-btn>
-      <v-btn @click="logout" text to="/odjava">
+      <v-btn v-if="$store.state.isUserLoggedIn" @click="logout" text to="/odjava">
         Odjava
       </v-btn>
     </v-toolbar-items>
@@ -36,7 +36,7 @@ export default {
       this.$store.dispatch('setToken', null);
       this.$store.dispatch('setUser', null);
       this.$router.push({
-        name: 'root',
+        name: 'home',
       });
     },
   },

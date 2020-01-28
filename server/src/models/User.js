@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const billSchema = require('./Bill');
+const Bill = require('./Bill');
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true
   },
-  bills: [billSchema],
+  bills: [Bill.schema],
   password: {
     type: String
   }

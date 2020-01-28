@@ -3,7 +3,7 @@
     <v-container fill-height fluid class="mt-8">
       <v-layout justify-center>
         <v-flex xs12 sm8 md4>
-          <v-form class="form">
+          <v-form class="form" @submit="login" onSubmit="return false;">
             <h1>Prijava</h1>
             <v-text-field
               v-model="username"
@@ -20,7 +20,7 @@
             />
             <v-btn
               class="mt-5 mb-5"
-              @click="login"
+              type="submit"
             >Prijava</v-btn>
           </v-form>
           <v-alert class="mt-5" dense outlined type="error" :value="!!error">
@@ -54,7 +54,7 @@ export default {
         this.$store.dispatch('setToken', response.data.token);
         this.$store.dispatch('setUser', response.data.user);
         this.$router.push({
-          name: '/',
+          name: 'home',
         });
       } catch (error) {
         this.error = error.response.data.error;

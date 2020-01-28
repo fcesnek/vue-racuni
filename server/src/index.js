@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const userRoutes = require('./routes/user');
+const billRoutes = require('./routes/bill');
 const config = require('./config/config');
 
 const app = express();
@@ -13,7 +14,10 @@ app.use(cors());
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 
+require('./passport');
+
 app.use('/user', userRoutes);
+app.use('/bills', billRoutes);
 
 mongoose.set('useCreateIndex', true);
 

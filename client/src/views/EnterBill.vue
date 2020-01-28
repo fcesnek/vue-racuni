@@ -21,6 +21,14 @@
             </v-card>
           </v-col>
         </v-row>
+        <v-row
+          align="center"
+          justify="center"
+          v-if="errors.length">
+          <v-alert justify-center class="mt-5" dense outlined type="error" :value="errors.length">
+            <span v-for="error in errors" :key="error">{{ error }}</span>
+          </v-alert>
+        </v-row>
       </v-flex>
 
       <v-flex v-show="isScanActive">
@@ -50,7 +58,7 @@
               label="Unos datoteka..."
             />
             <v-btn
-              @click="submitFiles"
+              @click="scanFiles"
               max-width="200px"
             >
               Skeniraj datoteke
@@ -71,19 +79,30 @@
         v-if="bills.length"
       >
         <v-layout row wrap class="form">
-          <v-flex xs9>
+          <v-flex xs12 md9>
             <h1>Uneseni računi</h1>
           </v-flex>
-          <v-flex xs3>
+          <v-flex xs12 md3>
             <v-btn @click="saveBills"><v-icon>mdi-content-save</v-icon>Pohrani račune</v-btn>
           </v-flex>
+          <v-flex xs12 justify-center align-center v-if="saveBillErrors.length">
+            <v-alert justify-center class="mt-5" dense outlined type="error" :value="!!saveBillErrors.length">
+              <span v-for="error in saveBillErrors" :key="error">{{ error }}</span>
+            </v-alert>
+          </v-flex>
+          <v-flex xs12 justify-center align-center v-if="successAlerts.length">
+            <v-alert justify-center class="mt-5" dense outlined type="success" :value="!!successAlerts.length">
+              <span v-for="msg in successAlerts" :key="msg">{{ msg }}</span>
+            </v-alert>
+          </v-flex>
           <v-flex
-            xs4
+            xs12
+            md4
             v-for="bill in bills"
             :key="bill.billNumber"
           >
             <BillCard
-              @editing="isEditing"
+              @editing="setEditing"
               @removeBill="removeBill"
               :bill="bill"
             />
@@ -97,6 +116,8 @@
 <script>
 // eslint-disable-next-line
 import Dynamsoft from 'Dynamsoft';
+import { mapState } from 'vuex';
+import BillService from '../services/BillService';
 import BillForm from '../components/BillForm.vue';
 import MonthPicker from '../components/MonthPicker.vue';
 import BillCard from '../components/BillCard/BillCard.vue';
@@ -134,10 +155,12 @@ export default {
       year: '',
       month: '',
       editing: false,
+      saveBillErrors: [],
+      successAlerts: [],
     };
   },
   methods: {
-    isEditing({ editing }) {
+    setEditing({ editing }) {
       this.editing = editing;
     },
     setPeriod(data) {
@@ -240,7 +263,7 @@ export default {
       }
       return 'Nepoznat';
     },
-    async submitFiles() {
+    async scanFiles() {
       const reader = await Dynamsoft.BarcodeReader.createInstance();
       for (const file of this.files) {
         // eslint-disable-next-line
@@ -258,12 +281,18 @@ export default {
       }
       this.files = [];
     },
-    saveBills() {
-      // TO DO
+    async saveBills() {
       if (this.editing) {
-        alert('FINISH EDITING FIRST!');
+        this.saveBillErrors.push('Prije pohrane podataka spremite sve račune i izađite iz načina uređivanja.');
       } else {
-        console.log('saving to db');
+        try {
+          this.saveBillErrors = [];
+          this.successAlerts = [];
+          await BillService.new(this.bills);
+          this.successAlerts.push('Računi uspješno spremljeni.');
+        } catch (error) {
+          this.saveBillErrors.push(error.response.data.error);
+        }
       }
     },
   },
@@ -271,6 +300,10 @@ export default {
     isAnyInputActive() {
       return this.isFormActive || this.isScanActive || this.isUploadActive;
     },
+    ...mapState([
+      'isUserLoggedIn',
+      'user',
+    ]),
   },
 };
 
