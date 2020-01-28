@@ -4,17 +4,11 @@ import EnterBill from '../views/EnterBill.vue';
 import BillsView from '../views/BillsView.vue';
 import LoginForm from '../views/LoginForm.vue';
 import RegisterForm from '../views/RegisterForm.vue';
-import Home from '../views/Home.vue';
 import store from '../store';
 
 Vue.use(VueRouter);
 
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: Home,
-  },
   {
     path: '/unos-racuna',
     name: 'enter-bill',
@@ -45,6 +39,7 @@ const routes = [
   },
   {
     path: '*',
+    name: 'home',
     redirect: '/unos-racuna',
   },
 ];

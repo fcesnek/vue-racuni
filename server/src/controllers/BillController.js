@@ -70,9 +70,35 @@ module.exports = {
         }
       });
 
-      res.status(200).send({ dbUser, msg: 'success!' });
+      res.status(200).send({ bills: dbUser.bills });
     } catch (error) {
       res.status(500).send({error: 'Greška pri dohvaćanju podataka. Pokušajte kasnije.'});
+    }
+  },
+  async edit (req, res) {
+    try {
+      const bills = req.body;
+      const { username } = req.user;
+
+      const dbUser = await User.findOne({
+        username,
+      });
+
+      for (let i = 0; i < bills.length; i++) {
+        try {
+          await User.updateOne(
+            { username, 'bills.billNumber': bills[i].billNumber }, 
+            { '$set': { 'bills.$.isPaidFor': bills[i].isPaidFor }}, 
+            function(err, update) {
+              console.log(update);
+            });
+        } catch (error) {
+          res.status(400).send({ error: 'Dogodila se greška pri spremanju računa. Pokušajte ponovno.'});
+        }
+      }
+      res.status(200).send({ bills: dbUser.bills, username: dbUser.username });
+    } catch (error) {
+      res.status(500).send({error});
     }
   },
 };

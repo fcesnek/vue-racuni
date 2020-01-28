@@ -1,19 +1,20 @@
 <template>
   <v-app>
-    <v-container>
-      <v-flex md6 xs12>
+    <v-container class="form mt-9 mb-9">
+      <v-flex md4 xs12>
         <v-select
-          :items="timePeriods"
+          :items="cities"
           label="1. Odaberite mjesto"
-          @change="changePeriod"
+          @change="changeCity"
           clearable
         ></v-select>
       </v-flex>
-      <v-flex md6 xs12>
+      <v-flex md4 xs12>
         <v-select
           :items="timePeriods"
           label="2. Odaberite vremensko razdoblje"
           @change="changePeriod"
+          clearable
         ></v-select>
       </v-flex>
       <v-flex xs12>
@@ -52,7 +53,6 @@
                 <v-card-title>
                   <span class="headline">Jeste li sigurni da želite obrisati račun?</span>
                 </v-card-title>
-
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="blue darken-1" text @click="removeBill">DA</v-btn>
@@ -60,11 +60,13 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-            <v-btn color="primary" dark class="mb-2" @click="saveToDb">Spremi promjene</v-btn>
+            <v-btn color="#c5e1a5" class="mb-2" @click="saveToDb">
+              <v-icon>mdi-content-save</v-icon>Spremi promjene
+            </v-btn>
           </v-toolbar>
         </template>
-        <template v-slot:item.name="{ item }">
-          <v-chip :color="getColor(item.isPaidFor)">{{ item.name }}</v-chip>
+        <template v-slot:item.type="{ item }">
+          <v-chip :color="getColor(item.isPaidFor)">{{ item.type }}</v-chip>
         </template>
         <template v-slot:body.append="{ headers }">
           <tr class="highlight-to-pay">
@@ -112,8 +114,9 @@ export default {
         { text: 'Tip računa', value: 'type' },
         { text: 'Poziv na broj', value: 'billNumber' },
         { text: 'Cijena (kn)', value: 'cost' },
+        { text: 'Razdoblje', value: 'period' },
         { text: 'Plaćen', value: 'isPaidFor', sortable: false },
-        { text: 'Actions', value: 'action', sortable: false },
+        { text: 'Radnje', value: 'action', sortable: false },
       ],
     };
   },
@@ -121,12 +124,27 @@ export default {
     this.bills = (await BillService.list()).data.bills;
     this.selectedBills = this.bills;
     this.timePeriods = this.bills.map(d => d.period);
+    this.cities = this.bills.map(d => d.payer.city.toUpperCase());
     this.calculateSums();
   },
   methods: {
-    changePeriod(selection) {
-      if (selection) this.selectedBills = this.bills.filter(d => d.period === selection);
+    changeCity(selection) {
+      if (selection) this.selectedBills = this.bills.filter(d => d.payer.city.toUpperCase() === selection.toUpperCase());
       else this.selectedBills = this.bills;
+      this.selectedCity = selection;
+      this.calculateSums();
+    },
+    changePeriod(selection) {
+      if (selection && this.selectedCity) {
+        this.selectedBills = this.bills.filter(d => d.period === selection
+                                                  && d.payer.city.toUpperCase() === this.selectedCity);
+      } else if (selection) {
+        this.selectedBills = this.bills.filter(d => d.period === selection);
+      } else if (this.selectedCity && !selection) {
+        this.selectedBills = this.bills.filter(d => d.payer.city.toUpperCase() === this.selectedCity.toUpperCase());
+      } else {
+        this.selectedBills = this.bills;
+      }
       this.selectedTimePeriod = selection;
       this.calculateSums();
     },
@@ -151,12 +169,21 @@ export default {
     async removeBill() {
       try {
         await BillService.remove(this.billToDelete.billNumber);
+        this.bills = this.bills.filter(obj => obj.billNumber !== this.billToDelete.billNumber);
+        this.selectedBills = this.selectedBills.filter(obj => obj.billNumber !== this.billToDelete.billNumber);
+        this.calculateSums();
+        this.billToDelete = {};
+        this.close();
       } catch (error) {
         console.log(error.response);
       }
     },
-    saveToDb() {
-      console.log('test');
+    async saveToDb() {
+      try {
+        await BillService.edit(this.bills);
+      } catch (error) {
+        console.log(error.response);
+      }
     },
     close() {
       this.dialog = false;

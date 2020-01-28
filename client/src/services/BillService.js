@@ -10,4 +10,7 @@ export default {
   remove(billNumber) {
     return Api().delete('bills/remove', { params: { billNumber } });
   },
+  edit(bills) {
+    return Api().put('bills/edit', bills);
+  },
 };

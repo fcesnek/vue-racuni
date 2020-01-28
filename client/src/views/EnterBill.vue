@@ -30,6 +30,9 @@
           </v-alert>
         </v-row>
       </v-flex>
+      <v-overlay :value="billLoaded" color="success">
+        <h1>Račun učitan</h1>
+      </v-overlay>
 
       <v-flex v-show="isScanActive">
         <v-container grid-list-md text-xs-center class="mt-5 form">
@@ -157,6 +160,7 @@ export default {
       editing: false,
       saveBillErrors: [],
       successAlerts: [],
+      billLoaded: false,
     };
   },
   methods: {
@@ -172,6 +176,11 @@ export default {
     },
     addBill({ bill }) {
       this.bills.push(bill);
+      this.billLoaded = true;
+      setTimeout(() => {
+        this.billLoaded = false;
+      }, 1200);
+      this.showForm();
     },
     showForm() {
       this.isFormActive = !this.isFormActive;
@@ -204,6 +213,10 @@ export default {
         UIElement: document.getElementById('div-video-container'),
         onUnduplicatedRead: (txt) => {
           this.parseResult(txt);
+          this.billLoaded = true;
+          setTimeout(() => {
+            this.billLoaded = false;
+          }, 1200);
         },
       }).then((s) => {
         this.barcodeScanner = s;
@@ -222,7 +235,9 @@ export default {
       const resultArr = result.split('\n');
       const costArr = resultArr[2].split('');
       costArr.splice(-2, 0, '.');
-      const city = resultArr[5].split(' ')[1];
+      const cityArr = resultArr[5].split(' ');
+      cityArr.shift();
+      const city = cityArr.join(' ');
       const bill = {
         cost: Number(costArr.join('')),
         payer: {
@@ -279,6 +294,10 @@ export default {
           this.errors.push('Barkod nije pronađen.');
         }
       }
+      this.billLoaded = true;
+      setTimeout(() => {
+        this.billLoaded = false;
+      }, 1200);
       this.files = [];
     },
     async saveBills() {
@@ -305,6 +324,9 @@ export default {
       'user',
     ]),
   },
+  beforeDestroy() {
+    if (this.barcodeScanner) this.hideScanner();
+  },
 };
 
 </script>
@@ -318,8 +340,8 @@ export default {
   }
 
   .dbrScanner-video {
-    width: 100%;
-    height: 100%;
+    width: 80%;
+    height: 80%;
     object-fit: cover;
   }
 
