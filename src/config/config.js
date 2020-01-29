@@ -3,5 +3,5 @@ module.exports = {
   authentication: {
     jwtSecret: process.env.JWT_SECRET || 'secret'
   },
-  dbPath: 'mongodb://localhost:27017/mevn-racuni'
+  dbPath: process.env.MONGO_URI || 'mongodb://localhost:27017/mevn-racuni'
 };
