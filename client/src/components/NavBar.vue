@@ -39,7 +39,7 @@ export default {
       this.$store.dispatch('setToken', null);
       this.$store.dispatch('setUser', null);
       this.$router.push({
-        name: 'home',
+        name: 'login-form',
       });
     },
   },
@@ -52,8 +52,5 @@ export default {
  }
  .home:hover {
    color: #333;
- }
-.v-slide-group__prev .v-slide-group__prev--disabled {
-   display: none!important;
  }
 </style>

@@ -48,6 +48,17 @@
               Svi računi
             </v-toolbar-title>
             <v-spacer></v-spacer>
+            <v-toolbar-title v-if="!!successAlert">
+              <v-alert justify-center class="mt-5" dismissible dense outlined type="success" :value="!!successAlert">
+                <span>{{ successAlert }}</span>
+              </v-alert>
+            </v-toolbar-title>
+            <v-toolbar-title v-if="!!errorAlert">
+              <v-alert justify-center class="mt-5" dismissible dense outlined type="error" :value="!!errorAlert">
+                <span>{{ errorAlert }}</span>
+              </v-alert>
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
             <v-dialog v-model="dialog" max-width="500px">
               <v-card>
                 <v-card-title>
@@ -102,6 +113,8 @@ export default {
       sumToPay: '',
       sumPaid: '',
       bills: [],
+      successAlert: '',
+      errorAlert: '',
       headers: [
         {
           text: 'Platitelj',
@@ -162,7 +175,6 @@ export default {
       }), 0);
     },
     showDialog(item) {
-      console.log(item);
       this.billToDelete = item;
       this.dialog = true;
     },
@@ -174,15 +186,21 @@ export default {
         this.calculateSums();
         this.billToDelete = {};
         this.close();
+        this.successAlert = '';
+        this.successAlert = 'Račun uspješno obrisan.';
       } catch (error) {
-        console.log(error.response);
+        this.errorAlert = '';
+        this.errorAlert = error.response.data.error;
       }
     },
     async saveToDb() {
       try {
+        this.successAlert = '';
         await BillService.edit(this.bills);
+        this.successAlert = 'Promjene uspješno spremljene.';
       } catch (error) {
-        console.log(error.response);
+        this.errorAlert = '';
+        this.errorAlert = error.response.data.error;
       }
     },
     close() {
