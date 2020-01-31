@@ -6,7 +6,7 @@ module.exports = {
       username: Joi.string().alphanum().min(3).max(30).required(),
       password: Joi.string().regex(
         new RegExp('^[a-zA-z0-9]{6,32}$')
-      ).min(6).max(32).required(),
+      ).min(8).max(32).required(),
     });
     const { error } = Joi.validate(req.body, schema);
     if (error) {
@@ -28,7 +28,7 @@ module.exports = {
             <br>
             1. Može sadržavati samo alfanumeričke znakove
             <br>
-            2. Duljina mora biti između 6 i 32 znaka.
+            2. Duljina mora biti između 8 i 32 znaka.
             `
         });
         break;
