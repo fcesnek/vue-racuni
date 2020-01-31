@@ -32,17 +32,15 @@ module.exports = {
         token: jwtSignUser({ username: savedUsername })
       });
     } catch (err) {
-      res.status(500).send({error: 'Greška pri spremanju podataka. Pokušajte kasnije.'});
+      res.status(500).send({msg: err, error: 'Greška pri spremanju podataka. Pokušajte kasnije.'});
     }
   },
   async login (req, res) {
     try {
       const { username, password } = req.body;
-      console.log(req.body);
       const user = await User.findOne({
         username
       });
-      console.log(user);
       
       if (!user) {
         return res.status(403).send({
@@ -62,6 +60,7 @@ module.exports = {
       });
     } catch (err) {
       res.status(500).send({
+        msg: err,
         error: 'Dogodila se greška prilikom autentikacije korisnika.'
       });
     }
