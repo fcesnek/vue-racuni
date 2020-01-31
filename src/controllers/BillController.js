@@ -16,7 +16,7 @@ module.exports = {
         res.status(400).send({ error: 'Greška pri dohvaćanju podataka. Pokušajte kasnije.' });
 
     } catch (err) {
-      res.status(500).send({error: 'Greška pri dohvaćanju podataka. Pokušajte kasnije.'});
+      res.status(500).send({msg: err, error: 'Greška pri dohvaćanju podataka. Pokušajte kasnije.'});
     }
   },
   async new (req, res) {
@@ -44,7 +44,7 @@ module.exports = {
             return;
           }
         } catch (error) {
-          res.status(400).send({ error: `Račun s pozivom na broj ${bills[i].billNumber} već postoji`});
+          res.status(400).send({msg: error, error: `Račun s pozivom na broj ${bills[i].billNumber} već postoji`});
         }
       }
       dbUser.save(function (error) {
@@ -72,7 +72,7 @@ module.exports = {
 
       res.status(200).send({ bills: dbUser.bills });
     } catch (error) {
-      res.status(500).send({error: 'Greška pri dohvaćanju podataka. Pokušajte kasnije.'});
+      res.status(500).send({msg: error, error: 'Greška pri dohvaćanju podataka. Pokušajte kasnije.'});
     }
   },
   async edit (req, res) {
